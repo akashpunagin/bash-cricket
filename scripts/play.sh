@@ -36,30 +36,6 @@ function handleBall() {
     fi
 }
 
-TEAMS=$(ls ../teams/)
-
-BATTING_TEAM=$(./utilities/showList "Which team should bat first?" $TEAMS)
-echo "BATTING TEAM IS: $BATTING_TEAM"
-
-PLAYERS=($(ls ../teams/$BATTING_TEAM/))
-echo "PLAYERS: ${PLAYERS[@]}"
-
-BATSMEN_1=$(./utilities/showList "Who should be 1st batsmen?" ${PLAYERS[@]})
-
-REMAINING_PLAYERS=$(removeValueFromArray ${PLAYERS[@]} $BATSMEN_1)
-echo "REMAINING PLAYERS: ${REMAINING_PLAYERS[@]}"
-
-BATSMEN_2=$(./utilities/showList "Who should be 2nd batsmen?" ${REMAINING_PLAYERS[@]})
-REMAINING_PLAYERS=$(removeValueFromArray ${REMAINING_PLAYERS[@]} $BATSMEN_2)
-echo "REMAINING PLAYERS: ${REMAINING_PLAYERS[@]}"
-
-echo "PLAYING $BATSMEN_1 , $BATSMEN_2"
-
-CURRENT_BATSMEN=$BATSMEN_1
-
-
-TOTAL_RUNS=0
-
 function getLengthOfArray() {
     # convert all arguements to array
     local a=("$@")
@@ -73,8 +49,38 @@ function getLengthOfArray() {
     echo "$count"
 }
 
+#### DRIVER CODE ####
+
+TEAMS=$(ls ../teams/)
+
+BATTING_TEAM=$(./utilities/showList "Which team should bat first?" $TEAMS)
+echo "BATTING TEAM IS: $BATTING_TEAM"
+
+PLAYERS=($(ls ../teams/$BATTING_TEAM/))
+echo "PLAYERS: ${PLAYERS[@]}"
+
+BATSMEN_1=$(./utilities/showList "Who should be 1st batsmen?" ${PLAYERS[@]})
+REMAINING_PLAYERS=$(removeValueFromArray ${PLAYERS[@]} $BATSMEN_1)
+
+BATSMEN_2=$(./utilities/showList "Who should be 2nd batsmen?" ${REMAINING_PLAYERS[@]})
+REMAINING_PLAYERS=$(removeValueFromArray ${REMAINING_PLAYERS[@]} $BATSMEN_2)
+
+echo "PLAYING $BATSMEN_1 , $BATSMEN_2"
+
+CURRENT_BATSMEN=$BATSMEN_1
+
+
+TOTAL_RUNS=0
+
+function swapCurrentBatsmen() {
+    if [ "$CURRENT_BATSMEN" == "$BATSMEN_1" ]; then
+        CURRENT_BATSMEN=$BATSMEN_2
+    elif [ "$CURRENT_BATSMEN" == "$BATSMEN_2" ]; then
+        CURRENT_BATSMEN=$BATSMEN_1
+    fi
+}
+
 while (( ${#REMAINING_PLAYERS[@]} )); do
-    echo "LENGTH:: ${REMAINING_PLAYERS[@]}"
     BALL_RES=$(handleBall $CURRENT_BATSMEN)
 
     echo -e "\n"
@@ -88,11 +94,23 @@ while (( ${#REMAINING_PLAYERS[@]} )); do
             break
         fi
         CURRENT_BATSMEN=$(./utilities/showList "Who should be batsmen?" ${REMAINING_PLAYERS[@]})
+        echo "$CURRENT_BATSMEN was chosen to bat"
 
     else
         RUNS=$BALL_RES
         echo "$CURRENT_BATSMEN scored $RUNS"
+        TOTAL_RUNS=$(expr $TOTAL_RUNS + $RUNS)
+
+        # swap players if odd runs scored
+        if [[ $RUNS -eq 1 || $RUNS -eq 3 ]]; then
+            echo "SWAP PLAYERS"
+            swapCurrentBatsmen
+        fi
+
+        echo "TOTAL RUNS: $TOTAL_RUNS"
+
     fi
 done
 
 echo "MATCH OVER"
+echo "TOTAL SCORE: $TOTAL_SCORE"
