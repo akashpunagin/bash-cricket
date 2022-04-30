@@ -129,4 +129,6 @@ while (( ${#REMAINING_PLAYERS[@]} )); do
 done
 
 echo "MATCH OVER"
-echo "TOTAL SCORE: $TOTAL_SCORE"
+echo "TOTAL SCORE: $TOTAL_RUNS"
+
+echo "$TOTAL_RUNS" > ../total_runs/$BATTING_TEAM
