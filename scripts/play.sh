@@ -40,20 +40,3 @@ BATSMEN_2=$(./utilities/showList "Who should be 2nd batsmen?" ${REMAINING_PLAYER
 
 echo "PLAYING $BATSMEN_1 , $BATSMEN_2"
 
-
-
-
-# TOTAL_BATSMEN=0
-# while [ "$TOTAL_BATSMEN" -ne 2 ]; do
-    
-#     SELECTED=$(zenity --list --title="CHECK" --column="CHECK" --column="Name" --checklist $PLAYERS $PLAYERS)
-#     echo "SELECTED: $SELECTED"
-
-#     TOTAL_BATSMEN=$(echo $SELECTED | grep -o "|" | wc -l)
-#     TOTAL_BATSMEN=$(expr $OCCUR + 1)
-
-#     echo "NUMBER OF OCCUR: $TOTAL_BATSMEN"
-# done
-
-# echo "FINAL PLAYERS TO BAT: $SELECTED"
-
