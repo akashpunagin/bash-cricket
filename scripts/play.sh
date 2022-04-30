@@ -75,7 +75,7 @@ while (( ${#REMAINING_PLAYERS[@]} )); do
     if [ $BALL_RES == "OUT" ]; then
         echo "$CURRENT_BATSMEN was out"
 
-        REMAINING_PLAYERS=$(removeValueFromArray ${REMAINING_PLAYERS[@]} $CURRENT_BATSMEN)
+        REMAINING_PLAYERS=$(./utilities/removeValueFromArray ${REMAINING_PLAYERS[@]} $CURRENT_BATSMEN)
         LEN=$(getLengthOfArray $REMAINING_PLAYERS)
         if [ "$LEN" -eq 0 ]; then
             echo "NO PLAYERS LEFT"
@@ -107,3 +107,4 @@ echo "MATCH OVER"
 echo "TOTAL SCORE: $TOTAL_RUNS"
 
 echo "$TOTAL_RUNS" > ../total_runs/$BATTING_TEAM
+
