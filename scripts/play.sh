@@ -39,10 +39,7 @@ REMAINING_PLAYERS=$(./utilities/removeValueFromArray ${PLAYERS[@]} $BATSMEN_1)
 BATSMEN_2=$(./utilities/showList "Who should be 2nd batsmen?" ${REMAINING_PLAYERS[@]})
 REMAINING_PLAYERS=$(./utilities/removeValueFromArray ${REMAINING_PLAYERS[@]} $BATSMEN_2)
 
-echo "PLAYING $BATSMEN_1 , $BATSMEN_2"
-
 CURRENT_BATSMEN=$BATSMEN_1
-
 
 TOTAL_RUNS=0
 
@@ -115,6 +112,6 @@ while (( ${#REMAINING_PLAYERS[@]} )); do
     fi
 done
 
-echo -e "MATCH OVER\nTOTAL SCORE: $TOTAL_RUNS"
+echo -e "Match Over\nTotal Score: $TOTAL_RUNS"
 echo "$TOTAL_RUNS" > ../total_runs/$BATTING_TEAM
 

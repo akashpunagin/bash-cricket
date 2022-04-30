@@ -44,7 +44,7 @@ function play() {
     TEMP_TEAMS=${TEAMS[@]}
 
     BATTING_TEAM=$(./utilities/showList "Which team should bat first?" $TEAMS)
-    echo "BATTING TEAM IS: $BATTING_TEAM"
+    echo -e "\nBatting team is: $BATTING_TEAM"
 
     ./utilities/showInfo \
         "$CLUB_NAME" \
