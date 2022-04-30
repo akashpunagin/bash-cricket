@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# convert all arguements to array
+a=("$@")
+
+# extract array by taking every element except last one
+ARRAY="${a[@]::${#a[@]}-1}"
+
+# extract last element in a variable
+REMOVE="${a[-1]}"
+
+REMOVED_ARRAY=()
+for item in ${ARRAY}; do
+    if [ "$item" != "$REMOVE" ]; then
+        REMOVED_ARRAY+=("$item")
+    fi
+done
+
+echo ${REMOVED_ARRAY[@]}

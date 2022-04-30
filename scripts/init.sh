@@ -28,6 +28,8 @@ function addPlayers() {
 
 rm -rf ../teams
 mkdir ../teams
+
+rm -rf ../total_runs 
 mkdir ../total_runs
 
 read -p "Enter team A name: " TEAM_A
