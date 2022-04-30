@@ -12,7 +12,7 @@ function displayScores() {
     MIN_SCORE=$(cat ${TEAMS[0]})
     MIN_TEAM=${TEAMS[0]}
 
-    echo "Details of the match"
+    echo -e "\nDetails of the match:"
     for file in "${TEAMS[@]}" ; do
         SCORE=$(cat $file)
         echo "Team \"$(basename $file)\" has scored $SCORE runs"

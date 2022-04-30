@@ -13,12 +13,22 @@ function addPlayers() {
     local TEAM_PATH=$3
     
     for ((i=1; i<=$N_PLAYERS; i++)); do
-        NAME=$($UTILITIES_PATH/prompt \
-            "Player Details of $TEAM_NAME" \
-            "Enter name of player-$i" \
-            "Please enter valid name for player-$i")
 
-        touch ./$TEAM_PATH/$NAME
+        while : ; do
+
+            NAME=$($UTILITIES_PATH/prompt \
+                "Player Details of $TEAM_NAME" \
+                "Enter name of player-$i" \
+                "Please enter valid name for player-$i")
+
+            if [ -f ./$TEAM_PATH/$NAME ]; then
+                ./$UTILITIES_PATH/showWarning "Player \"$NAME\" already exists"
+                continue
+            else
+                touch ./$TEAM_PATH/$NAME
+                break
+            fi
+        done
     done
 
     ./$UTILITIES_PATH/showInfo "Players Added" "Players added to team: $2"
@@ -31,6 +41,9 @@ mkdir ../teams
 
 rm -rf ../total_runs 
 mkdir ../total_runs
+
+read -p "Enter the number of overs: " N_OVERS
+echo "$N_OVERS" > ../n_overs
 
 read -p "Enter team A name: " TEAM_A
 

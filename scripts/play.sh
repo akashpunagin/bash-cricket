@@ -32,7 +32,6 @@ function getLengthOfArray() {
 BATTING_TEAM=$1
 
 PLAYERS=($(ls ../teams/$BATTING_TEAM/))
-echo "PLAYERS: ${PLAYERS[@]}"
 
 BATSMEN_1=$(./utilities/showList "Who should be 1st batsmen?" ${PLAYERS[@]})
 REMAINING_PLAYERS=$(./utilities/removeValueFromArray ${PLAYERS[@]} $BATSMEN_1)
@@ -67,10 +66,23 @@ function updatePlayerFile() {
     echo "$PLAYER_RUNS" > $PLAYER_PATH
 }
 
-while (( ${#REMAINING_PLAYERS[@]} )); do
-    BALL_RES=$(handleBall $CURRENT_BATSMEN)
+N_OVERS=$(cat ../n_overs)
+echo "Total overs: $N_OVERS"
+N_BALLS=$(expr $N_OVERS \* 6)
+echo "Total balls: $N_BALLS"
+CURRENT_BALL=0
 
-    echo -e "\n"
+while (( ${#REMAINING_PLAYERS[@]} )); do
+    CURRENT_BALL=$(expr $CURRENT_BALL + 1)
+
+    if [ $CURRENT_BALL -ge $N_BALLS ]; then
+        echo "No balls remaining"
+        break
+    fi
+
+    echo -e "\nBall $CURRENT_BALL of $N_BALLS. Remaining: $(expr $N_BALLS - $CURRENT_BALL) balls"
+
+    BALL_RES=$(handleBall $CURRENT_BATSMEN)
 
     if [ $BALL_RES == "OUT" ]; then
         echo "$CURRENT_BATSMEN was out"
@@ -98,13 +110,11 @@ while (( ${#REMAINING_PLAYERS[@]} )); do
             swapCurrentBatsmen
         fi
 
-        echo "TOTAL RUNS: $TOTAL_RUNS"
+        echo -e "TOTAL RUNS: $TOTAL_RUNS\n"
 
     fi
 done
 
-echo "MATCH OVER"
-echo "TOTAL SCORE: $TOTAL_RUNS"
-
+echo -e "MATCH OVER\nTOTAL SCORE: $TOTAL_RUNS"
 echo "$TOTAL_RUNS" > ../total_runs/$BATTING_TEAM
 
