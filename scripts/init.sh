@@ -14,7 +14,7 @@ function addPlayers() {
     
     for ((i=1; i<=$N_PLAYERS; i++)); do
         NAME=$($UTILITIES_PATH/prompt \
-            "Player Details of $TEAM_NAME (Team A)" \
+            "Player Details of $TEAM_NAME" \
             "Enter name of player-$i" \
             "Please enter valid name for player-$i")
 

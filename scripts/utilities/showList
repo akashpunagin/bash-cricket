@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Do not include spaces in values of rows
+
+TITLE=$1
+LIST_HEADER=$2
+ROWS="${@:2}"
+
+VALUE=$(zenity --list --title="$1" --column="Name" $ROWS)
+echo $VALUE
