@@ -80,6 +80,18 @@ function swapCurrentBatsmen() {
     fi
 }
 
+function updatePlayerFile() {
+    PLAYER_PATH="../teams/$BATTING_TEAM/$CURRENT_BATSMEN"
+    PLAYER_RUNS=$(cat $PLAYER_PATH)
+
+    if [ -n "$PLAYER_RUNS" ]; then
+        PLAYER_RUNS=$(expr $PLAYER_RUNS + $RUNS)
+    else 
+        PLAYER_RUNS="$RUNS"
+    fi
+    echo "$PLAYER_RUNS" > $PLAYER_PATH
+}
+
 while (( ${#REMAINING_PLAYERS[@]} )); do
     BALL_RES=$(handleBall $CURRENT_BATSMEN)
 
@@ -87,6 +99,7 @@ while (( ${#REMAINING_PLAYERS[@]} )); do
 
     if [ $BALL_RES == "OUT" ]; then
         echo "$CURRENT_BATSMEN was out"
+
         REMAINING_PLAYERS=$(removeValueFromArray ${REMAINING_PLAYERS[@]} $CURRENT_BATSMEN)
         LEN=$(getLengthOfArray $REMAINING_PLAYERS)
         if [ "$LEN" -eq 0 ]; then
@@ -99,6 +112,9 @@ while (( ${#REMAINING_PLAYERS[@]} )); do
     else
         RUNS=$BALL_RES
         echo "$CURRENT_BATSMEN scored $RUNS"
+
+        updatePlayerFile
+        
         TOTAL_RUNS=$(expr $TOTAL_RUNS + $RUNS)
 
         # swap players if odd runs scored
