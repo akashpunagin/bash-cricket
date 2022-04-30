@@ -1,0 +1,16 @@
+#!/bin/bash
+
+TITLE=$1
+TEXT=$2
+WARNING_TEXT=$3
+
+VALUE=$(zenity --entry --title="$TITLE" --text="$TEXT")
+
+# if the length of string is zero then read value again
+while [ -z "$VALUE" ]; do
+    ./utilities/showWarning "$WARNING_TEXT"
+    VALUE=$(zenity --entry --title="$TITLE" --text="$TEXT")
+done
+
+# echo the VALUE to return the VALUE 
+echo $VALUE

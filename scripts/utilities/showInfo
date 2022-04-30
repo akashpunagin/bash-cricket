@@ -1,0 +1,5 @@
+#!/bin/bash
+
+INFO_TITLE=$1
+INFO_TEXT=$2
+zenity --info --title="$INFO_TITLE" --text="$INFO_TEXT" --no-wrap

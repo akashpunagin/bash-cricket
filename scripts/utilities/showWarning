@@ -1,0 +1,4 @@
+#!/bin/bash
+
+WARNING_TEXT=$1
+zenity --warning --text="$WARNING_TEXT" --no-wrap
