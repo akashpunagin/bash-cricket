@@ -2,4 +2,5 @@
 
 SOUND=$(ls ../sounds/four | shuf -n 1)
 
+./sounds/play "../sounds/crowd/1.mp3"
 ./sounds/play "../sounds/four/$SOUND"
