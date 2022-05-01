@@ -1,0 +1,12 @@
+#!/bin/bash
+
+AUDIO_PATH=$1
+N_LOOP=$2
+
+if [ -n N_LOOP ]; then
+    N_LOOP=1
+fi
+
+mpg321 -q -l $N_LOOP $AUDIO_PATH &
+
+

@@ -28,6 +28,19 @@ function getLengthOfArray() {
     echo "$count"
 }
 
+function playSound() {
+    local BALL_RES=$1
+
+    if [ "$BALL_RES" == "4" ]; then
+        ./sounds/four
+    elif [ "$BALL_RES" == "6" ]; then
+        ./sounds/six
+    elif [ "$BALL_RES" == "OUT" ]; then
+        ./sounds/out
+    fi
+}
+
+
 #### DRIVER CODE ####
 BATTING_TEAM=$1
 
@@ -81,6 +94,8 @@ while (( ${#REMAINING_PLAYERS[@]} )); do
 
     BALL_RES=$(handleBall $CURRENT_BATSMEN)
 
+    playSound $BALL_RES
+
     if [ $BALL_RES == "OUT" ]; then
         echo "$CURRENT_BATSMEN was out"
 
@@ -96,6 +111,7 @@ while (( ${#REMAINING_PLAYERS[@]} )); do
     else
         RUNS=$BALL_RES
         echo "$CURRENT_BATSMEN scored $RUNS"
+
 
         updatePlayerFile
         
