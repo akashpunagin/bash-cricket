@@ -1,5 +1,21 @@
 #!/bin/bash
 
+# Reset
+T_RESET=`tput sgr0`
+
+# Foreground
+F_RED=`tput setaf 1`
+F_GREEN=`tput setaf 2`
+F_WHITE=`tput setaf 7`
+F_YELLOW=`tput setaf 3`
+
+# Background
+B_BLACK=`tput setab 0`
+B_RED=`tput setab 1`
+B_GREEN=`tput setab 2`
+B_WHITE=`tput setab 7`
+
+
 function handleBall() {
     # returns "OUT" if out else returns number of runs
     local CURRENT_BATSMEN=$1
@@ -82,36 +98,41 @@ N_BALLS=$(expr $N_OVERS \* 6)
 echo "Total balls: $N_BALLS"
 CURRENT_BALL=0
 
+function displayEndMatchMessage() {
+    local MESSAGE=$1
+
+    echo -e "\n${F_RED}${MESSAGE}${T_RESET}"
+}
+
 while (( ${#REMAINING_PLAYERS[@]} )); do
     CURRENT_BALL=$(expr $CURRENT_BALL + 1)
 
     if [ $CURRENT_BALL -ge $N_BALLS ]; then
-        echo "No balls remaining"
+        displayEndMatchMessage "No balls remaining"
         break
     fi
 
-    echo -e "\nBall $CURRENT_BALL of $N_BALLS. Remaining: $(expr $N_BALLS - $CURRENT_BALL) balls"
+    echo -e "\nBall ${F_YELLOW}$CURRENT_BALL${F_WHITE} of ${F_YELLOW}$N_BALLS${F_WHITE}. Remaining: ${F_GREEN}$(expr $N_BALLS - $CURRENT_BALL)${F_WHITE} balls"
 
     BALL_RES=$(handleBall $CURRENT_BATSMEN)
 
     playSound $BALL_RES
 
     if [ $BALL_RES == "OUT" ]; then
-        echo "$CURRENT_BATSMEN was out"
+        echo "${B_RED}${F_YELLOW}$CURRENT_BATSMEN was out${T_RESET}"
 
         REMAINING_PLAYERS=$(./utilities/removeValueFromArray ${REMAINING_PLAYERS[@]} $CURRENT_BATSMEN)
         LEN=$(getLengthOfArray $REMAINING_PLAYERS)
         if [ "$LEN" -eq 0 ]; then
-            echo "NO PLAYERS LEFT"
+            displayEndMatchMessage "No players left"
             break
         fi
         CURRENT_BATSMEN=$(./utilities/showList "Who should be batsmen?" ${REMAINING_PLAYERS[@]})
-        echo "$CURRENT_BATSMEN was chosen to bat"
+        echo "${F_GREEN}$CURRENT_BATSMEN${T_RESET} was chosen to bat"
 
     else
         RUNS=$BALL_RES
-        echo "$CURRENT_BATSMEN scored $RUNS"
-
+        echo "${F_GREEN}$CURRENT_BATSMEN${F_WHITE} scored ${F_YELLOW}$RUNS${T_RESET} runs"
 
         updatePlayerFile
         
@@ -119,15 +140,14 @@ while (( ${#REMAINING_PLAYERS[@]} )); do
 
         # swap players if odd runs scored
         if [[ $RUNS -eq 1 || $RUNS -eq 3 ]]; then
-            echo "SWAP PLAYERS"
             swapCurrentBatsmen
         fi
 
-        echo -e "TOTAL RUNS: $TOTAL_RUNS\n"
+        echo -e "${B_BLACK}${F_GREEN}Total Runs: $TOTAL_RUNS${T_RESET}\n"
 
     fi
 done
 
-echo -e "Match Over\nTotal Score: $TOTAL_RUNS"
+echo -e "\nMatch Over\n${B_BLACK}Total Score: $TOTAL_RUNS${T_RESET}"
 echo "$TOTAL_RUNS" > ../total_runs/$BATTING_TEAM
 

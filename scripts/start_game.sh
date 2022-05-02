@@ -3,6 +3,21 @@
 UTILITIES_PATH="./utilities"
 CLUB_NAME="RV Cricket Club"
 
+# Reset
+T_RESET=`tput sgr0`
+
+# Foreground
+F_RED=`tput setaf 1`
+F_GREEN=`tput setaf 2`
+F_WHITE=`tput setaf 7`
+F_YELLOW=`tput setaf 3`
+
+# Background
+B_BLACK=`tput setab 0`
+B_RED=`tput setab 1`
+B_GREEN=`tput setab 2`
+B_WHITE=`tput setab 7`
+
 function displayScores() {
     TEAMS=($(ls ../total_runs/*))
 
@@ -12,10 +27,10 @@ function displayScores() {
     MIN_SCORE=$(cat ${TEAMS[0]})
     MIN_TEAM=${TEAMS[0]}
 
-    echo -e "\nDetails of the match:"
+    echo -e "\n${B_BLACK}${F_WHITE}Details of the match:${T_RESET}\n"
     for file in "${TEAMS[@]}" ; do
         SCORE=$(cat $file)
-        echo "Team \"$(basename $file)\" has scored $SCORE runs"
+        echo "Team \"${F_YELLOW}$(basename $file)${T_RESET}\" has scored ${F_YELLOW}$SCORE${T_RESET} runs"
 
         # calculating max score
         if [ $SCORE -gt $MAX_SCORE ]; then
@@ -31,11 +46,10 @@ function displayScores() {
     done
 
     if [ $MAX_SCORE -ne $MIN_SCORE ]; then
-        echo -e "\nTeam \"$(basename $MAX_TEAM)\" wins this match by $(expr $MAX_SCORE - $MIN_SCORE) runs!"
+        echo -e "\n${B_BLACK}${F_WHITE}Team ${F_GREEN}$(basename $MAX_TEAM)${F_WHITE} wins this match by ${F_GREEN}$(expr $MAX_SCORE - $MIN_SCORE)${F_WHITE} runs!${T_RESET}"
     else
-        echo -e "\nThe match between Team \"$(basename $MAX_TEAM) and\" Team \"$(basename $MIN_TEAM)\" was a draw"
+        echo -e "\n${B_BLACK}${F_WHITE}The match was a ${F_YELLOW}draw${T_RESET}"
     fi
-
 }
 
 function play() {
@@ -44,7 +58,7 @@ function play() {
     TEMP_TEAMS=${TEAMS[@]}
 
     BATTING_TEAM=$(./utilities/showList "Which team should bat first?" $TEAMS)
-    echo -e "\nBatting team is: $BATTING_TEAM"
+    echo -e "\nBatting team is: ${F_GREEN}$BATTING_TEAM${T_RESET}"
 
     ./utilities/showInfo \
         "$CLUB_NAME" \
@@ -74,17 +88,20 @@ function play() {
 
 ### DRIVER CODE ###
 
-if [ -d "../teams" ]; then
-    RES=$(./$UTILITIES_PATH/showConfirmation "Players exist" "Do you want to remove existing teams and add new teams?")
-    if [ "$RES" -eq 0 ]; then
-        # dont add players, play with existing players
-        echo "Playing with existing players"
-        play
-    else
-        # add team, players, and play
-        bash init.sh
-        play
-    fi
-else
-    bash init.sh
-fi
+# if [ -d "../teams" ]; then
+#     RES=$(./$UTILITIES_PATH/showConfirmation "Players exist" "Do you want to remove existing teams and add new teams?")
+#     if [ "$RES" -eq 0 ]; then
+#         # dont add players, play with existing players
+#         echo "${F_GREEN}Playing with existing players${T_RESET}"
+#         play
+#     else
+#         # add team, players, and play
+#         bash init.sh
+#         play
+#     fi
+# else
+#     bash init.sh
+# fi
+
+
+displayScores

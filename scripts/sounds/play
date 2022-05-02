@@ -7,4 +7,5 @@ if [ -n N_LOOP ]; then
     N_LOOP=1
 fi
 
+killall mpg321 > /dev/null 2>&1
 mpg321 -q --loop $N_LOOP $AUDIO_PATH > /dev/null 2>&1 &
