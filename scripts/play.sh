@@ -61,6 +61,10 @@ function playSound() {
         ./sounds/six
     elif [ "$BALL_RES" == "OUT" ]; then
         ./sounds/out
+    elif [ "$BALL_RES" == "NO_BALL" ]; then
+        ./sounds/out
+    elif [ "$BALL_RES" == "WIDE" ]; then
+        ./sounds/out
     fi
 }
 
