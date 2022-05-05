@@ -1,0 +1,5 @@
+#!/bin/bash
+
+SOUND=$(ls ../sounds/no_ball | shuf -n 1)
+
+./sounds/play "../sounds/no_ball/$SOUND"

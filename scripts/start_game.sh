@@ -101,4 +101,5 @@ if [ -d "../teams" ]; then
     fi
 else
     bash init.sh
+    play
 fi

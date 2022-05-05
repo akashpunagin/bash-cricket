@@ -54,17 +54,18 @@ function getLengthOfArray() {
 
 function playSound() {
     local BALL_RES=$1
+    local IS_NO_BALL=$2
 
     if [ "$BALL_RES" == "4" ]; then
         ./sounds/four
     elif [ "$BALL_RES" == "6" ]; then
         ./sounds/six
-    elif [ "$BALL_RES" == "OUT" ]; then
+    elif [ "$BALL_RES" == "OUT" ] && [ $IS_NO_BALL -eq 0 ]; then
         ./sounds/out
     elif [ "$BALL_RES" == "NO_BALL" ]; then
-        ./sounds/out
+        ./sounds/no_ball
     elif [ "$BALL_RES" == "WIDE" ]; then
-        ./sounds/out
+        ./sounds/wide
     fi
 }
 
@@ -84,6 +85,7 @@ CURRENT_BATSMEN=$BATSMEN_1
 
 TOTAL_RUNS=0
 
+# Dependent functions
 function swapCurrentBatsmen() {
     if [ "$CURRENT_BATSMEN" == "$BATSMEN_1" ]; then
         CURRENT_BATSMEN=$BATSMEN_2
@@ -113,19 +115,19 @@ function displayFreeHit() {
     echo "${B_GREEN}${F_WHITE}Free Hit${T_RESET}"
 }
 
-N_OVERS=$(cat ../n_overs)
-echo "Total overs: $N_OVERS"
-N_BALLS=$(expr $N_OVERS \* 6)
-echo "Total balls: $N_BALLS"
-CURRENT_BALL=0
-
 function displayEndMatchMessage() {
     local MESSAGE=$1
-
     echo -e "\n${F_RED}${MESSAGE}${T_RESET}"
 }
 
+N_OVERS=$(cat ../n_overs)
+echo "Total overs: ${F_YELLOW}$N_OVERS${T_RESET}"
+N_BALLS=$(expr $N_OVERS \* 6)
+echo "Total balls: ${F_YELLOW}$N_BALLS${T_RESET}"
+
+CURRENT_BALL=0
 IS_NO_BALL=0
+
 while (( ${#REMAINING_PLAYERS[@]} )); do
     CURRENT_BALL=$(expr $CURRENT_BALL + 1)
 
@@ -138,7 +140,7 @@ while (( ${#REMAINING_PLAYERS[@]} )); do
 
     BALL_RES=$(handleBall $CURRENT_BATSMEN)
 
-    playSound $BALL_RES
+    playSound $BALL_RES $IS_NO_BALL
 
     if [ $BALL_RES == "OUT" ]; then
 
@@ -161,9 +163,10 @@ while (( ${#REMAINING_PLAYERS[@]} )); do
     elif [ $BALL_RES == "WIDE" ]; then
         N_BALLS=$(expr $N_BALLS + 1)
         TOTAL_RUNS=$(expr $TOTAL_RUNS + 1)
-        displayTotalRuns $TOTAL_RUNS
     elif [ $BALL_RES == "NO_BALL" ]; then
         IS_NO_BALL=1
+        N_BALLS=$(expr $N_BALLS + 1)
+
         displayFreeHit
     else
         RUNS=$BALL_RES
@@ -177,10 +180,8 @@ while (( ${#REMAINING_PLAYERS[@]} )); do
         if [[ $RUNS -eq 1 || $RUNS -eq 3 ]]; then
             swapCurrentBatsmen
         fi
-
-        displayTotalRuns $TOTAL_RUNS
-
     fi
+    displayTotalRuns $TOTAL_RUNS
 done
 
 echo -e "\nMatch Over\n${B_BLACK}Total Score: $TOTAL_RUNS${T_RESET}"
