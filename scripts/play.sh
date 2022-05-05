@@ -17,13 +17,21 @@ B_WHITE=`tput setab 7`
 
 
 function handleBall() {
-    # returns "OUT" if out else returns number of runs
+    # returns "OUT" if out
+    # "WIDE" if wide
+    # "NO_BALL" if no ball
+    # else returns number of runs
+    
     local CURRENT_BATSMEN=$1
-    RES=$(./utilities/showList "How did $CURRENT_BATSMEN handle the ball?" "Scored_Run" "Wicket")
+    RES=$(./utilities/showList "How did $CURRENT_BATSMEN handle the ball?" "Scored_Run" "Wicket" "Extras")
 
     if [ "$RES" == "Scored_Run" ]; then 
         RUNS=$(./utilities/showList "How much runs was scored?" 0 1 2 3 4 6)
         echo $RUNS
+        return 0
+    elif [ "$RES" == "Extras" ]; then
+        EXTRA=$(./utilities/showList "Which extra?" "WIDE" "NO_BALL")
+        echo $EXTRA
         return 0
     else
         echo "OUT"
@@ -46,13 +54,18 @@ function getLengthOfArray() {
 
 function playSound() {
     local BALL_RES=$1
+    local IS_NO_BALL=$2
 
     if [ "$BALL_RES" == "4" ]; then
         ./sounds/four
     elif [ "$BALL_RES" == "6" ]; then
         ./sounds/six
-    elif [ "$BALL_RES" == "OUT" ]; then
+    elif [ "$BALL_RES" == "OUT" ] && [ $IS_NO_BALL -eq 0 ]; then
         ./sounds/out
+    elif [ "$BALL_RES" == "NO_BALL" ]; then
+        ./sounds/no_ball
+    elif [ "$BALL_RES" == "WIDE" ]; then
+        ./sounds/wide
     fi
 }
 
@@ -72,6 +85,7 @@ CURRENT_BATSMEN=$BATSMEN_1
 
 TOTAL_RUNS=0
 
+# Dependent functions
 function swapCurrentBatsmen() {
     if [ "$CURRENT_BATSMEN" == "$BATSMEN_1" ]; then
         CURRENT_BATSMEN=$BATSMEN_2
@@ -92,17 +106,27 @@ function updatePlayerFile() {
     echo "$PLAYER_RUNS" > $PLAYER_PATH
 }
 
-N_OVERS=$(cat ../n_overs)
-echo "Total overs: $N_OVERS"
-N_BALLS=$(expr $N_OVERS \* 6)
-echo "Total balls: $N_BALLS"
-CURRENT_BALL=0
+function displayTotalRuns() {
+    local TOTAL_RUNS=$1
+    echo -e "${B_BLACK}${F_GREEN}Total Runs: $TOTAL_RUNS${T_RESET}\n"
+}
+
+function displayFreeHit() {
+    echo "${B_GREEN}${F_WHITE}Free Hit${T_RESET}"
+}
 
 function displayEndMatchMessage() {
     local MESSAGE=$1
-
     echo -e "\n${F_RED}${MESSAGE}${T_RESET}"
 }
+
+N_OVERS=$(cat ../n_overs)
+echo "Total overs: ${F_YELLOW}$N_OVERS${T_RESET}"
+N_BALLS=$(expr $N_OVERS \* 6)
+echo "Total balls: ${F_YELLOW}$N_BALLS${T_RESET}"
+
+CURRENT_BALL=0
+IS_NO_BALL=0
 
 while (( ${#REMAINING_PLAYERS[@]} )); do
     CURRENT_BALL=$(expr $CURRENT_BALL + 1)
@@ -116,20 +140,34 @@ while (( ${#REMAINING_PLAYERS[@]} )); do
 
     BALL_RES=$(handleBall $CURRENT_BATSMEN)
 
-    playSound $BALL_RES
+    playSound $BALL_RES $IS_NO_BALL
 
     if [ $BALL_RES == "OUT" ]; then
-        echo "${B_RED}${F_YELLOW}$CURRENT_BATSMEN was out${T_RESET}"
 
-        REMAINING_PLAYERS=$(./utilities/removeValueFromArray ${REMAINING_PLAYERS[@]} $CURRENT_BATSMEN)
-        LEN=$(getLengthOfArray $REMAINING_PLAYERS)
-        if [ "$LEN" -eq 0 ]; then
-            displayEndMatchMessage "No players left"
-            break
+        if [ $IS_NO_BALL -eq 1 ]; then
+            echo "${B_RED}${F_YELLOW}$CURRENT_BATSMEN was out${T_RESET}, but it was a $(displayFreeHit)"
+            IS_NO_BALL=0    
+        else
+            echo "${B_RED}${F_YELLOW}$CURRENT_BATSMEN was out${T_RESET}"
+
+            REMAINING_PLAYERS=$(./utilities/removeValueFromArray ${REMAINING_PLAYERS[@]} $CURRENT_BATSMEN)
+            LEN=$(getLengthOfArray $REMAINING_PLAYERS)
+            if [ "$LEN" -eq 0 ]; then
+                displayEndMatchMessage "No players left"
+                break
+            fi
+            CURRENT_BATSMEN=$(./utilities/showList "Who should be batsmen?" ${REMAINING_PLAYERS[@]})
+            echo "${F_GREEN}$CURRENT_BATSMEN${T_RESET} was chosen to bat"
         fi
-        CURRENT_BATSMEN=$(./utilities/showList "Who should be batsmen?" ${REMAINING_PLAYERS[@]})
-        echo "${F_GREEN}$CURRENT_BATSMEN${T_RESET} was chosen to bat"
 
+    elif [ $BALL_RES == "WIDE" ]; then
+        N_BALLS=$(expr $N_BALLS + 1)
+        TOTAL_RUNS=$(expr $TOTAL_RUNS + 1)
+    elif [ $BALL_RES == "NO_BALL" ]; then
+        IS_NO_BALL=1
+        N_BALLS=$(expr $N_BALLS + 1)
+
+        displayFreeHit
     else
         RUNS=$BALL_RES
         echo "${F_GREEN}$CURRENT_BATSMEN${F_WHITE} scored ${F_YELLOW}$RUNS${T_RESET} runs"
@@ -142,10 +180,8 @@ while (( ${#REMAINING_PLAYERS[@]} )); do
         if [[ $RUNS -eq 1 || $RUNS -eq 3 ]]; then
             swapCurrentBatsmen
         fi
-
-        echo -e "${B_BLACK}${F_GREEN}Total Runs: $TOTAL_RUNS${T_RESET}\n"
-
     fi
+    displayTotalRuns $TOTAL_RUNS
 done
 
 echo -e "\nMatch Over\n${B_BLACK}Total Score: $TOTAL_RUNS${T_RESET}"
