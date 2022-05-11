@@ -72,6 +72,9 @@ function playSound() {
 
 #### DRIVER CODE ####
 BATTING_TEAM=$1
+CURRENT_INNINGS=$2
+OLD_BATTING_TEAM=$3
+
 
 PLAYERS=($(ls ../teams/$BATTING_TEAM/))
 
@@ -182,6 +185,18 @@ while (( ${#REMAINING_PLAYERS[@]} )); do
         fi
     fi
     displayTotalRuns $TOTAL_RUNS
+
+    if [ $CURRENT_INNINGS -eq 2 ]; then
+        OTHER_TEAM_SCORE=$(cat ../total_runs/$OLD_BATTING_TEAM)
+        if [ $TOTAL_RUNS -gt $OTHER_TEAM_SCORE ]; then
+            ./utilities/showInfo \
+                "Match Over" \
+                "$BATTING_TEAM has scored more runs then $OLD_BATTING_TEAM"
+        
+            break
+        fi
+    fi
+
 done
 
 echo -e "\nMatch Over\n${B_BLACK}Total Score: $TOTAL_RUNS${T_RESET}"

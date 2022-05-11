@@ -64,7 +64,8 @@ function play() {
         "$CLUB_NAME" \
         "First Innings will be played by team \"$BATTING_TEAM\""
 
-    ./play.sh "$BATTING_TEAM"
+    ./play.sh "$BATTING_TEAM" 1
+    OLD_BATTING_TEAM=$BATTING_TEAM
 
     ./utilities/showInfo \
         "$CLUB_NAME: 1st innings finished" \
@@ -77,7 +78,7 @@ function play() {
         "$CLUB_NAME" \
         "Second Innings will be played by team \"$BATTING_TEAM\""
 
-    ./play.sh "$BATTING_TEAM"
+    ./play.sh "$BATTING_TEAM" 2 $OLD_BATTING_TEAM
 
     ./utilities/showInfo \
         "$CLUB_NAME: 2nd innings finished" \
